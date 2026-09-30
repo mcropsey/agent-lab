@@ -1,0 +1,18 @@
+[Unit]
+Description=agent-lab persona scheduler
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=@USER@
+WorkingDirectory=@HOME@/agent-lab
+EnvironmentFile=@HOME@/agent-lab/.env
+ExecStart=@HOME@/agent-lab/.venv/bin/python -m agentlab.scheduler
+Restart=on-failure
+RestartSec=30
+SyslogIdentifier=agentlab
+MemoryMax=768M
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

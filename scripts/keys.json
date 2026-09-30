@@ -1,0 +1,237 @@
+{
+  "team": {
+    "team_alias": "agent-lab",
+    "max_budget": 10.0,
+    "budget_duration": "1d",
+    "max_parallel_requests": 1,
+    "models": [
+      "agentlab-main",
+      "agentlab-main-patient"
+    ]
+  },
+  "keys": [
+    {
+      "alias": "agent-triage",
+      "env": "AGENTLAB_KEY_TRIAGE",
+      "max_budget": 1.0,
+      "rpm_limit": 30,
+      "tpm_limit": 120000,
+      "models": [
+        "agentlab-main",
+        "agentlab-main-patient"
+      ],
+      "max_parallel_requests": 1,
+      "agent": {
+        "title": "Ticket triage",
+        "framework": "PydanticAI",
+        "host": "hv-rocky-linux-3 (.100)",
+        "description": "Classifies synthetic support tickets, sets priority, flags PII and drafts a reply. Tools: customer lookup, status page.",
+        "skills": [
+          {
+            "id": "triage-ticket",
+            "name": "Triage a support ticket",
+            "tags": [
+              "support",
+              "classification",
+              "pii"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "alias": "agent-sre",
+      "env": "AGENTLAB_KEY_SRE",
+      "max_budget": 1.0,
+      "rpm_limit": 30,
+      "tpm_limit": 120000,
+      "models": [
+        "agentlab-main",
+        "agentlab-main-patient"
+      ],
+      "max_parallel_requests": 1,
+      "agent": {
+        "title": "SRE log analyst",
+        "framework": "LangGraph",
+        "host": "hv-rocky-linux-3 (.100)",
+        "description": "Investigates generated service logs with list/read/search file tools and writes an incident summary.",
+        "skills": [
+          {
+            "id": "investigate-logs",
+            "name": "Investigate an incident from logs",
+            "tags": [
+              "sre",
+              "logs",
+              "incident"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "alias": "agent-analyst",
+      "env": "AGENTLAB_KEY_ANALYST",
+      "max_budget": 1.0,
+      "rpm_limit": 30,
+      "tpm_limit": 120000,
+      "models": [
+        "agentlab-main",
+        "agentlab-main-patient"
+      ],
+      "max_parallel_requests": 1,
+      "agent": {
+        "title": "Data analyst",
+        "framework": "LangGraph",
+        "host": "rasp5 (.85)",
+        "description": "Answers business questions over the Chinook SQLite database with a read-only SQL tool, retrying failed queries.",
+        "skills": [
+          {
+            "id": "sql-analysis",
+            "name": "Answer a question with SQL",
+            "tags": [
+              "sql",
+              "analytics"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "alias": "agent-news",
+      "env": "AGENTLAB_KEY_NEWS",
+      "max_budget": 1.0,
+      "rpm_limit": 20,
+      "tpm_limit": 120000,
+      "models": [
+        "agentlab-main",
+        "agentlab-main-patient"
+      ],
+      "max_parallel_requests": 1,
+      "agent": {
+        "title": "News digest",
+        "framework": "PydanticAI",
+        "host": "rasp5 (.85)",
+        "description": "Pulls public RSS feeds, summarizes each item, tags topics and writes a digest overview.",
+        "skills": [
+          {
+            "id": "news-digest",
+            "name": "Summarize and tag news",
+            "tags": [
+              "news",
+              "summarization"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "alias": "agent-customer",
+      "env": "AGENTLAB_KEY_CUSTOMER",
+      "max_budget": 1.0,
+      "rpm_limit": 30,
+      "tpm_limit": 120000,
+      "models": [
+        "agentlab-main",
+        "agentlab-main-patient"
+      ],
+      "max_parallel_requests": 1,
+      "agent": {
+        "title": "Simulated customer",
+        "framework": "OpenAI Agents SDK",
+        "host": "rk1 (.75)",
+        "description": "Plays a customer with a random temperament and goal in a 3-8 turn chat with the support agent.",
+        "skills": [
+          {
+            "id": "customer-chat",
+            "name": "Chat with support as a customer",
+            "tags": [
+              "simulation",
+              "conversation"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "alias": "agent-support",
+      "env": "AGENTLAB_KEY_SUPPORT",
+      "max_budget": 1.0,
+      "rpm_limit": 30,
+      "tpm_limit": 120000,
+      "models": [
+        "agentlab-main",
+        "agentlab-main-patient"
+      ],
+      "max_parallel_requests": 1,
+      "agent": {
+        "title": "Customer support",
+        "framework": "OpenAI Agents SDK",
+        "host": "rk1 (.75)",
+        "description": "Answers the simulated customer using fake CRM tools: order lookup, refund, address change, password reset, escalation.",
+        "skills": [
+          {
+            "id": "support-chat",
+            "name": "Resolve a customer issue",
+            "tags": [
+              "support",
+              "crm",
+              "tools"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "alias": "agent-reviewer",
+      "env": "AGENTLAB_KEY_REVIEWER",
+      "max_budget": 1.0,
+      "rpm_limit": 20,
+      "tpm_limit": 250000,
+      "models": [
+        "agentlab-main",
+        "agentlab-main-patient"
+      ],
+      "max_parallel_requests": 1,
+      "agent": {
+        "title": "Code reviewer",
+        "framework": "OpenAI Agents SDK",
+        "host": "rk2 (.76)",
+        "description": "Reviews diffs with planted bugs or synthetic diffs of the lab's own code, with long file context.",
+        "skills": [
+          {
+            "id": "code-review",
+            "name": "Review a code change",
+            "tags": [
+              "code-review",
+              "long-context"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "alias": "agent-redteam",
+      "env": "AGENTLAB_KEY_REDTEAM",
+      "max_budget": 1.0,
+      "rpm_limit": 20,
+      "tpm_limit": 120000,
+      "models": [
+        "agentlab-main",
+        "agentlab-main-patient"
+      ],
+      "max_parallel_requests": 1
+    },
+    {
+      "alias": "agent-chaos",
+      "env": "AGENTLAB_KEY_CHAOS",
+      "max_budget": 0.1,
+      "rpm_limit": 2,
+      "tpm_limit": 5000,
+      "models": [
+        "agentlab-main",
+        "agentlab-main-patient"
+      ],
+      "max_parallel_requests": 1
+    }
+  ]
+}

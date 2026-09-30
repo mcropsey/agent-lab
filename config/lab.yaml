@@ -1,0 +1,30 @@
+# agent-lab global config.
+# The scheduler re-reads this file on every wake-up, so edits apply without a restart.
+# Push edits to every host with:  ./deploy.sh config
+
+global:
+  enabled: true            # KILL SWITCH - false makes every persona skip its runs (processes stay up)
+  intensity: 1.0           # multiplies every run rate (0.5 = half the traffic, 2 = double)
+  timezone: America/Chicago
+  error_rate: 0.02         # share of LLM calls sent deliberately wrong (bad model name / over-long prompt)
+  jitter: 0.5              # each wait is randomised +/- this fraction
+  max_wait_minutes: 30     # waits are capped so rate changes (time of day / intensity) apply within this window
+  chaos_bursts_per_day: 6  # rate-limit bursts on the agent-chaos key (at night rate; scaled like the personas)
+
+  # The LM Studio GPU is used for interactive work during the day, so the lab stays light then.
+  # A host also pauses for 30 min if a daytime call is unusually slow (GPU likely busy).
+  schedule:
+    day_start_hour: 8      # 08:00-22:00 local = daytime
+    day_end_hour: 22
+    day_rate: 0.13         # ~1.4 runs/hour lab-wide during the day
+    night_rate: 1.0        # 22:00-08:00: full rate (~10.5 runs/hour lab-wide)
+
+# runs_per_hour = rate at night with intensity 1.0. Every persona uses agentlab-main (qwen3.8-27b);
+# the agent keys are locked to that route in LiteLLM, which also caps it at 1 request in flight.
+personas:
+  triage:        {enabled: true, model: agentlab-main, runs_per_hour: 3}
+  sre:           {enabled: true, model: agentlab-main, runs_per_hour: 1.5}
+  analyst:       {enabled: true, model: agentlab-main, runs_per_hour: 2}
+  news:          {enabled: true, model: agentlab-main, runs_per_hour: 1}
+  conversation:  {enabled: true, model: agentlab-main, runs_per_hour: 2}
+  reviewer:      {enabled: true, model: agentlab-main, runs_per_hour: 1}

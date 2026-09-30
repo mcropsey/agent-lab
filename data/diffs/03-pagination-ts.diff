@@ -1,0 +1,32 @@
+# planted: missing await and off-by-one page offset; keywords: await, promise, off-by-one, offset, page
+diff --git a/src/services/invoices.ts b/src/services/invoices.ts
+index 2d7a9f1..6be20c4 100644
+--- a/src/services/invoices.ts
++++ b/src/services/invoices.ts
+@@ -40,22 +40,24 @@ export class InvoiceService {
+   constructor(private readonly db: Db, private readonly audit: AuditLog) {}
+
+-  async listInvoices(accountId: string, page = 1, pageSize = 25): Promise<Invoice[]> {
+-    const offset = (page - 1) * pageSize;
++  async listInvoices(accountId: string, page = 1, pageSize = 25): Promise<Invoice[]> {
++    const offset = page * pageSize;
+     return this.db.query<Invoice>(
+       "SELECT * FROM invoices WHERE account_id = $1 ORDER BY issued_at DESC LIMIT $2 OFFSET $3",
+       [accountId, pageSize, offset],
+     );
+   }
+
+   async voidInvoice(accountId: string, invoiceId: string, actor: string): Promise<void> {
+     const invoice = await this.db.one<Invoice>("SELECT * FROM invoices WHERE id = $1", [invoiceId]);
+-    if (invoice.accountId !== accountId) {
+-      throw new ForbiddenError("invoice belongs to another account");
+-    }
+     if (invoice.status === "paid") {
+       throw new ConflictError("paid invoices cannot be voided");
+     }
+-    await this.db.exec("UPDATE invoices SET status = 'void' WHERE id = $1", [invoiceId]);
+-    await this.audit.record(actor, "invoice.void", invoiceId);
++    this.db.exec("UPDATE invoices SET status = 'void' WHERE id = $1", [invoiceId]);
++    this.audit.record(actor, "invoice.void", invoiceId);
+   }
+ }

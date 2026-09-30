@@ -1,0 +1,10 @@
+
+# >>> agent-lab router settings (added by agent-lab/scripts/setup_litellm.sh; delete this block to undo) >>>
+router_settings:
+  # Rejects requests larger than a model's max_input_tokens before they reach LM Studio,
+  # so the lab's deliberate "oversized context" errors never touch the GPU.
+  enable_pre_call_checks: true
+  # Same model, longer timeout: demonstrates fallback without ever loading a second model.
+  fallbacks:
+    - agentlab-main: ["agentlab-main-patient"]
+# <<< agent-lab router settings <<<

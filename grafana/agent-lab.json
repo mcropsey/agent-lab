@@ -1,0 +1,836 @@
+{
+ "uid": "agent-lab",
+ "title": "Agent Lab: AI agent traffic via LiteLLM",
+ "tags": [
+  "agent-lab",
+  "litellm",
+  "loki"
+ ],
+ "description": "Scheduled AI agents (~/agent-lab on .101) calling LiteLLM (.101:4000) -> LM Studio qwen3.8-27b. One JSON log line per agent run, shipped by Alloy to Loki.",
+ "timezone": "browser",
+ "schemaVersion": 39,
+ "editable": false,
+ "refresh": "1m",
+ "time": {
+  "from": "now-24h",
+  "to": "now"
+ },
+ "panels": [
+  {
+   "id": 1,
+   "type": "stat",
+   "title": "Runs",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "decimals": null
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "none"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum(count_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" [$__range]))",
+     "legendFormat": "",
+     "queryType": "instant"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "type": "stat",
+   "title": "Success rate",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 4,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 1
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "none"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum(count_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | success=\"true\" [$__range])) / sum(count_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" [$__range]))",
+     "legendFormat": "",
+     "queryType": "instant"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "type": "stat",
+   "title": "Tokens",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 8,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "decimals": null
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "none"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum(sum_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | unwrap total_tokens [$__range]))",
+     "legendFormat": "",
+     "queryType": "instant"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "type": "stat",
+   "title": "LLM calls",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "decimals": null
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "none"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum(sum_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | unwrap llm_calls [$__range]))",
+     "legendFormat": "",
+     "queryType": "instant"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "type": "stat",
+   "title": "LLM errors",
+   "description": "Includes the deliberate ones: wrong model name (403), over-long prompt (400), rate-limit bursts (429).",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 16,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "decimals": null
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "none"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum(sum_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | unwrap llm_errors [$__range]))",
+     "legendFormat": "",
+     "queryType": "instant"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "type": "stat",
+   "title": "Spend (simulated $)",
+   "description": "From LiteLLM's x-litellm-response-cost header; pricing on the agentlab-* routes is simulated.",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 20,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 4
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "value",
+    "graphMode": "none"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum(sum_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | unwrap cost_usd [$__range]))",
+     "legendFormat": "",
+     "queryType": "instant"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "type": "timeseries",
+   "title": "Runs per persona",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 4,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "bars",
+      "fillOpacity": 70,
+      "lineWidth": 1,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "normal"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum by (persona) (count_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" [$__auto]))",
+     "legendFormat": "{{persona}}",
+     "queryType": "range"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "type": "timeseries",
+   "title": "Tokens per persona",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 4,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "bars",
+      "fillOpacity": 70,
+      "lineWidth": 1,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "normal"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum by (persona) (sum_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | unwrap total_tokens [$__auto]))",
+     "legendFormat": "{{persona}}",
+     "queryType": "range"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "type": "timeseries",
+   "title": "LLM errors per persona",
+   "description": "Deliberate errors are listed in each run's injected_errors field.",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 12,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "bars",
+      "fillOpacity": 70,
+      "lineWidth": 1,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "normal"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum by (persona) (sum_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | unwrap llm_errors [$__auto]))",
+     "legendFormat": "{{persona}}",
+     "queryType": "range"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "type": "timeseries",
+   "title": "Spend per persona (simulated $)",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 12,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "custom": {
+      "drawStyle": "bars",
+      "fillOpacity": 70,
+      "lineWidth": 1,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "normal"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum by (persona) (sum_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | unwrap cost_usd [$__auto]))",
+     "legendFormat": "{{persona}}",
+     "queryType": "range"
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "type": "timeseries",
+   "title": "p95 run latency",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 20,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ms",
+     "custom": {
+      "drawStyle": "line",
+      "fillOpacity": 10,
+      "lineWidth": 1,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "none"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "quantile_over_time(0.95, {job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | unwrap latency_ms [$__auto]) by (persona)",
+     "legendFormat": "{{persona}}",
+     "queryType": "range"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "type": "timeseries",
+   "title": "Runs per host (source IP)",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 20,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "bars",
+      "fillOpacity": 70,
+      "lineWidth": 1,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "normal"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum by (host) (count_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" [$__auto]))",
+     "legendFormat": "{{host}}",
+     "queryType": "range"
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "type": "timeseries",
+   "title": "Tool executions per persona",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 28,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "bars",
+      "fillOpacity": 70,
+      "lineWidth": 1,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "normal"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum by (persona) (sum_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | unwrap tool_executions [$__auto]))",
+     "legendFormat": "{{persona}}",
+     "queryType": "range"
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "type": "timeseries",
+   "title": "Failed runs per persona",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 28,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "bars",
+      "fillOpacity": 70,
+      "lineWidth": 1,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "normal"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "sum by (persona) (count_over_time({job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\" | success=\"false\" [$__auto]))",
+     "legendFormat": "{{persona}}",
+     "queryType": "range"
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "type": "logs",
+   "title": "Failed runs and daytime back-offs",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 36,
+    "w": 24,
+    "h": 10
+   },
+   "options": {
+    "showTime": true,
+    "wrapLogMessage": true,
+    "enableLogDetails": true,
+    "sortOrder": "Descending",
+    "prettifyLogMessage": false
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "{job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | persona=~\"$persona\" | host=~\"$host\" | success=\"false\" or event=\"backoff\"",
+     "legendFormat": "",
+     "queryType": "range"
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "type": "logs",
+   "title": "All run lines",
+   "description": "",
+   "datasource": {
+    "type": "loki",
+    "uid": "loki"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 46,
+    "w": 24,
+    "h": 12
+   },
+   "options": {
+    "showTime": true,
+    "wrapLogMessage": true,
+    "enableLogDetails": true,
+    "sortOrder": "Descending",
+    "prettifyLogMessage": false
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "loki",
+      "uid": "loki"
+     },
+     "expr": "{job=~\"docker|journal\"} |= `\"lab\": \"agent-lab\"` | json | event=\"run\" | persona=~\"$persona\" | host=~\"$host\"",
+     "legendFormat": "",
+     "queryType": "range"
+    }
+   ]
+  }
+ ],
+ "templating": {
+  "list": [
+   {
+    "name": "persona",
+    "label": "persona",
+    "type": "custom",
+    "multi": true,
+    "includeAll": true,
+    "query": "triage,sre,analyst,news,conversation,reviewer,chaos",
+    "allValue": ".+",
+    "current": {
+     "text": "All",
+     "value": [
+      "$__all"
+     ]
+    }
+   },
+   {
+    "name": "host",
+    "label": "host",
+    "type": "custom",
+    "multi": true,
+    "includeAll": true,
+    "query": "hv-rocky-linux-3,rasp5,rk1,rk2",
+    "allValue": ".+",
+    "current": {
+     "text": "All",
+     "value": [
+      "$__all"
+     ]
+    }
+   }
+  ]
+ }
+}

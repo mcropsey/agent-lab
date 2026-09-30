@@ -1,0 +1,26 @@
+  # >>> agent-lab models (added by agent-lab/scripts/setup_litellm.sh; delete this block to undo) >>>
+  # Both routes use qwen3.8-27b, the model LM Studio keeps loaded, so lab traffic never
+  # triggers a model load/swap. Pricing is simulated so budgets and spend are meaningful.
+  - model_name: agentlab-main
+    litellm_params:
+      model: openai/qwen/qwen3.8-27b
+      api_base: os.environ/LMSTUDIO_API_BASE
+__API_KEY_LINE__
+      timeout: 180
+      max_parallel_requests: 1   # lab-wide cap: at most one agent request on the GPU at a time
+    model_info:
+      input_cost_per_token: 0.0000003
+      output_cost_per_token: 0.0000012
+      max_input_tokens: 32768
+  - model_name: agentlab-main-patient
+    litellm_params:
+      model: openai/qwen/qwen3.8-27b
+      api_base: os.environ/LMSTUDIO_API_BASE
+__API_KEY_LINE__
+      timeout: 600
+      max_parallel_requests: 1
+    model_info:
+      input_cost_per_token: 0.0000003
+      output_cost_per_token: 0.0000012
+      max_input_tokens: 32768
+  # <<< agent-lab models <<<

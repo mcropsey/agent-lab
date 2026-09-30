@@ -1,0 +1,17 @@
+# One scheduler container per host; PERSONAS (in .env, written by deploy.sh) picks what it runs.
+services:
+  agentlab:
+    build: .
+    image: agentlab:latest
+    container_name: agentlab
+    hostname: ${AGENTLAB_HOST:-agentlab}
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./config:/app/config:ro   # lab.yaml edits apply without a rebuild
+    mem_limit: 768m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -1,0 +1,34 @@
+# planted: storage bucket made publicly readable; keywords: public, acl, read, exposure, block
+diff --git a/infra/storage.tf b/infra/storage.tf
+index 3f0a7c1..b92d4e0 100644
+--- a/infra/storage.tf
++++ b/infra/storage.tf
+@@ -1,28 +1,23 @@
+ resource "aws_s3_bucket" "invoices" {
+   bucket = "acme-invoices-prod"
+
+   tags = {
+     team        = "billing"
+     environment = "prod"
+   }
+ }
+
+-resource "aws_s3_bucket_public_access_block" "invoices" {
+-  bucket                  = aws_s3_bucket.invoices.id
+-  block_public_acls       = true
+-  block_public_policy     = true
+-  ignore_public_acls      = true
+-  restrict_public_buckets = true
+-}
++resource "aws_s3_bucket_acl" "invoices" {
++  bucket = aws_s3_bucket.invoices.id
++  acl    = "public-read"
++}
+
+ resource "aws_s3_bucket_versioning" "invoices" {
+   bucket = aws_s3_bucket.invoices.id
+   versioning_configuration {
+-    status = "Enabled"
++    status = "Suspended"
+   }
+ }

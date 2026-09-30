@@ -1,0 +1,28 @@
+# planted: sql built with string formatting; keywords: injection, parameter, f-string, sanitiz
+diff --git a/shop/api/orders.py b/shop/api/orders.py
+index 4c1e2aa..9b7f310 100644
+--- a/shop/api/orders.py
++++ b/shop/api/orders.py
+@@ -18,14 +18,19 @@ from shop.db import get_conn
+ bp = Blueprint("orders", __name__)
+
+
+ @bp.get("/orders")
+ @login_required
+ def list_orders():
+-    rows = get_conn().execute(
+-        "SELECT id, status, total FROM orders WHERE customer_id = ? ORDER BY created_at DESC LIMIT 50",
+-        (current_user.id,),
+-    ).fetchall()
++    status = request.args.get("status", "")
++    query = f"SELECT id, status, total FROM orders WHERE customer_id = {current_user.id}"
++    if status:
++        query += f" AND status = '{status}'"
++    query += " ORDER BY created_at DESC LIMIT 50"
++    rows = get_conn().execute(query).fetchall()
+     return jsonify([dict(r) for r in rows])
+
+
+ @bp.get("/orders/<int:order_id>")
+ @login_required
+ def get_order(order_id):

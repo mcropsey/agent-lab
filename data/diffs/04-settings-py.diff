@@ -1,0 +1,33 @@
+# planted: hardcoded credential and debug mode enabled; keywords: hardcoded, secret, password, credential, debug
+diff --git a/config/settings.py b/config/settings.py
+index 7e10b3d..a4c2f88 100644
+--- a/config/settings.py
++++ b/config/settings.py
+@@ -1,24 +1,22 @@
+ import os
+ from pathlib import Path
+
+ BASE_DIR = Path(__file__).resolve().parent.parent
+
+-DEBUG = os.environ.get("DJANGO_DEBUG", "false").lower() == "true"
+-SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
++DEBUG = True
++SECRET_KEY = "dev-secret-key-do-not-use-in-prod-8f2c1e"
+
+-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
++ALLOWED_HOSTS = ["*"]
+
+ DATABASES = {
+     "default": {
+         "ENGINE": "django.db.backends.postgresql",
+         "NAME": os.environ.get("DB_NAME", "shop"),
+         "USER": os.environ.get("DB_USER", "shop"),
+-        "PASSWORD": os.environ["DB_PASSWORD"],
++        "PASSWORD": "changeme123",
+         "HOST": os.environ.get("DB_HOST", "localhost"),
+         "PORT": os.environ.get("DB_PORT", "5432"),
+     }
+ }
+
+ SESSION_COOKIE_SECURE = True
+ CSRF_COOKIE_SECURE = True
