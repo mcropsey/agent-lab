@@ -104,8 +104,8 @@ Built with Claude Code over one session on 2026-09-29 (times are America/Chicago
 | .103 | `~/agentlab-dev` (venv + key file) created for testing | Already deleted (~21:10) |
 | LM Studio .194 | Never accessed directly. Test traffic via LiteLLM loaded 3 extra models (since unloaded by the user) | — |
 | `~/cropsey-lab` on .101 | `lab-inventory.md`, `home-lab-topology.html` rewritten; `home-lab-topology.png` (light) and `cropsey-lab.png` (dark) re-rendered; `archive/2026-09-19/` holds the old PNGs | — |
-| .101 `~/.ssh` | Deploy keys `github_agent_lab`, `github_cropsey_lab` (+ `.pub`) and two `Host github-*` entries in `~/.ssh/config`; `~/cropsey-lab` turned into a git clone of `mcropsey/cropsey-lab` | Remove the keys on GitHub (repo → Settings → Deploy keys) and locally |
-| GitHub | New private repo `mcropsey/agent-lab`; `mcropsey/cropsey-lab` updated with the refreshed docs (master-key suffix removed for the public copy) | — |
+| .101 `~/.ssh` | Deploy keys `github_agent_lab`, `github_cropsey_lab` (+ `.pub`) and two `Host github-*` entries in `~/.ssh/config` were generated but never registered on GitHub (the user uploaded via the web UI). `~/cropsey-lab` turned into a git clone of `mcropsey/cropsey-lab` | `rm ~/.ssh/github_agent_lab* ~/.ssh/github_cropsey_lab*` and delete the two `Host github-*` blocks |
+| GitHub | New **public** repo `mcropsey/agent-lab` and refreshed `mcropsey/cropsey-lab`, both uploaded by the user through the web UI (~21:37). Scanned after upload: no agent keys, master key or passwords; `.env` not included. Master-key suffix removed from the public inventory. | — |
 | Nothing on .77, .78, .99, .102, .104, .105 | Read-only checks only | — |
 
 ---
@@ -139,6 +139,9 @@ Built with Claude Code over one session on 2026-09-29 (times are America/Chicago
 - Alertmanager receiver is still `null` (pre-existing).
 - .99 and .101 report 3.6 Gi RAM (documented 6.0 / 8.1 Gi on 2026-09-19); cause unverified.
 - `vulnnotes` container on .98 exited 13 days ago (pre-existing, safe to remove).
-- ~~`~/agent-lab` exists only on .101~~ Pushed to private `github.com/mcropsey/agent-lab`. `.env` is not in git;
+- ~~`~/agent-lab` exists only on .101~~ Uploaded to public `github.com/mcropsey/agent-lab`. `.env` is not in git;
   regenerate it with `scripts/setup_keys.sh`.
 - Spend before 2026-09-29 21:25 isn't attributed to agents (pre-registration test traffic).
+- `.gitignore` isn't on GitHub yet (the web uploader skips dotfiles); add it via *Add file → Create new file*.
+- Local git history on .101 differs from GitHub's upload commits (same content). To track GitHub:
+  `git fetch <repo url> main && git reset --hard FETCH_HEAD` in each repo.

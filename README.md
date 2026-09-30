@@ -13,7 +13,7 @@ lab's LiteLLM proxy. Built for demos and API-security lab work; no real business
 | `~/cropsey-lab/lab-inventory.md` | lab-wide inventory (all 13 hosts), incl. LiteLLM and this lab |
 | `~/cropsey-lab/home-lab-topology.html`, `.png` / `cropsey-lab.png` | topology diagrams (light / dark renders of the same page) |
 
-GitHub: `mcropsey/agent-lab` (private, this repo) · `mcropsey/cropsey-lab` (public, lab docs).
+GitHub: `mcropsey/agent-lab` (public, this repo) · `mcropsey/cropsey-lab` (public, lab docs). Neither contains secrets: agent keys live only in `.env` on .101 (git-ignored); regenerate with `scripts/setup_keys.sh`.
 
 ```
  .100 hv-rocky-linux-3 ─ docker ─ triage, sre, chaos ─┐
